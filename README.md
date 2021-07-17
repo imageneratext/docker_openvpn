@@ -114,7 +114,7 @@ sudo apt-get -y install network-manager-openvpn
 
 5. Go to _IPv4_ section and ✅ check _"Use this connection only for resources on its network"_ (this let us ↪️ redirect to _VPN_ only traffic of routes added). <details><summary>See image</summary>![ipv4_vpn_setting](https://user-images.githubusercontent.com/22328176/126045421-a7c1a4f7-e6b5-4cde-8386-44f64ce010d2.png)</details>
 
-## 📱 Configure app
+## 📱 Configure internal app
 
 - Check external interface (e.g: `eth0`)
 
@@ -123,10 +123,10 @@ ip route list default
 # eg output: default via 139.59.160.1 dev eth0 proto static
 ```
 
-- 🔐 Restricts connections to all _IPs_ except of the _VPN_ server via `iptables` in server how show in [🐋 docker doc](https://docs.docker.com/network/iptables/#restrict-connections-to-the-docker-host)
+- 🔐 Restricts connections to all _IPs_ except of the _VPN_ server via `iptables` how say in [🐋 docker doc](https://docs.docker.com/network/iptables/#restrict-connections-to-the-docker-host)
 
 ```shell
-sudo iptables -I DOCKER-USER -i eth0 ! -s 206.189.116.221 -j DROP
+sudo iptables -I DOCKER-USER -i eth0 ! -s 111.111.111.111 -j DROP
 ```
 
 - ❤️ Useful commands
@@ -135,7 +135,7 @@ sudo iptables -I DOCKER-USER -i eth0 ! -s 206.189.116.221 -j DROP
 # to show iptables rules
 sudo iptables -L --line-numbers
 # to remove iptables rules
-sudo iptables -D DOCKER-USER -i eth0 ! -s 159.65.51.187 -j DROP
+sudo iptables -D DOCKER-USER -i eth0 ! -s 111.111.111.111 -j DROP
 ```
 
 ## 🖇️ References
