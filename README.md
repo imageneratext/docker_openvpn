@@ -14,7 +14,7 @@ This project uses [kylemanna openvpn](https://hub.docker.com/r/kylemanna/openvpn
 ### 💼 Solution
 
 - Create _VPN_ server specifying the _IP_ 🛣️ route of the internal app
-- In the internal all server, restrict all 🔗 connections _IPs_ except of the _VPN_ server (image from [heavymetaldev](https://heavymetaldev.com/openvpn-with-docker))
+- In the internal app server, we restrict all 🔗 connections _IPs_ except of the _VPN_ server (image from [heavymetaldev](https://heavymetaldev.com/openvpn-with-docker))
 
 ![vpn_diagram](https://user-images.githubusercontent.com/22328176/126044983-3883e6e1-276c-430d-8610-850a425fc562.png)
 
@@ -27,7 +27,7 @@ sudo apt update && sudo apt install -y docker.io docker-compose
 sudo usermod -aG docker $USER && newgrp docker
 ```
 
-📝 Note: We **recommend** not setup with root user, (you can create user with sudo permissions following next [🦮 guide](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-20-04))
+📝 Note: We **recommend** not setup with root user (you can create user with sudo permissions following next [🦮 guide](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-20-04))
 
 ### 📥 Clone project
 
@@ -144,4 +144,4 @@ sudo iptables -D DOCKER-USER -i eth0 ! -s 159.65.51.187 -j DROP
 
 - Kylemanna openvpn docker image [📄 doc](https://github.com/kylemanna/docker-openvpn) and [▶️ video](https://www.youtube.com/watch?v=Ulew2JHUHfE) tutorial
 
-- Kylemanna openvpn [🐙 docker-compose doc](https://github.com/kylemanna/docker-openvpn) https://github.com/kylemanna/docker-openvpn/blob/master/docs/docker-compose.md
+- Kylemanna openvpn [🐙 docker-compose doc](https://github.com/kylemanna/docker-openvpn/blob/master/docs/docker-compose.md)
