@@ -8,13 +8,13 @@ This project uses [kylemanna openvpn](https://hub.docker.com/r/kylemanna/openvpn
 
 ### 😬 Problem
 
-- We want 🚀 deploy an docker application in the ☁️ cloud **restricting** the access via _VPN_
-- In the clients we only want to ↪️ redirect the **traffic** to the _VPN_ when we go to the application, the rest going through the 📍 local network
+- We want 🚀 deploy an docker application in the ☁️ cloud **restricting** the access via _VPN_ (it is an internal company app)
+- In the clients we only want to ↪️ redirect the **traffic** to the _VPN_ when we go to the internal application, the rest going through the 📍 local network
 
 ### 💼 Solution
 
-- Create _VPN_ server specifying _IP_ 🛣️ routes
-- Restrict all 🔗 connections _IPs_ except of the _VPN_ server in the application (image from [heavymetaldev](https://heavymetaldev.com/openvpn-with-docker))
+- Create _VPN_ server specifying the _IP_ 🛣️ route of the internal app
+- In the internal all server, restrict all 🔗 connections _IPs_ except of the _VPN_ server (image from [heavymetaldev](https://heavymetaldev.com/openvpn-with-docker))
 
 ![vpn_diagram](https://user-images.githubusercontent.com/22328176/126044983-3883e6e1-276c-430d-8610-850a425fc562.png)
 
@@ -45,8 +45,8 @@ docker-compose run --rm openvpn ovpn_genconfig -N -d -u udp://${PUBLIC_SERVER_IP
 
 📝 Notes:
 
-- We can define a domain in `PUBLIC_SERVER_IP`
-- We can define a _IPs_ range in `ROUTE` (e.g: `ROUTE="route 222.222.222.0 255.255.255.0"`)
+- `PUBLIC_SERVER_IP` is the public _IP_ of _VPN_ server (it could specify the domain)
+- `ROUTE` indicates the _domain/IP_ which the _VPN_ will route traffic from client (it can be a _IPs_ range like `ROUTE="route 222.222.222.0 255.255.255.0"` or several `-p` arguments)
 
 ### 🔑 Create CA key
 
@@ -56,7 +56,7 @@ Run the next command and set a _CA_ password
 docker-compose run --rm openvpn ovpn_initpki
 ```
 
-### 🆙 Up server
+### 🆙 Up open-vpn server
 
 ```shell
 docker-compose up -d openvpn
@@ -64,10 +64,10 @@ docker-compose up -d openvpn
 
 ### 👤 Create client certificates
 
-Will ask create a password for the client and specify the _CA_ to authenticate
+Will ask a password for the client and specify the _CA_ to authenticate
 
 ```shell
-export CLIENTNAME="startup_local_pc_2"
+export CLIENTNAME="client_1"
 docker-compose run --rm openvpn easyrsa build-client-full $CLIENTNAME
 docker-compose run --rm openvpn ovpn_getclient $CLIENTNAME > $CLIENTNAME.ovpn
 ```
@@ -85,13 +85,13 @@ docker-compose run --rm openvpn ovpn_revokeclient $CLIENTNAME remove
 
 ## 💻 Configure client
 
-- 📥 Copy client file from client
+- 📥 Copy certificate file from client
 
 ```shell
 scp user@public_server_ip:path/client_name.ovpn .
 ```
 
-- ⚙️ Configure client _VPN_ via shell
+- 🔛 Enable client _VPN_ via shell
 
 ```shell
 sudo apt-get install openvpn
@@ -116,7 +116,7 @@ sudo apt-get -y install network-manager-openvpn
 
 ## 📱 Configure app
 
-- Check external interface (eth0)
+- Check external interface (e.g: `eth0`)
 
 ```shell
 ip route list default
@@ -134,7 +134,7 @@ sudo iptables -I DOCKER-USER -i eth0 ! -s 206.189.116.221 -j DROP
 ```shell
 # to show iptables rules
 sudo iptables -L --line-numbers
-# to remove iptables rule (need to add a different ip)
+# to remove iptables rules
 sudo iptables -D DOCKER-USER -i eth0 ! -s 159.65.51.187 -j DROP
 ```
 
@@ -143,3 +143,5 @@ sudo iptables -D DOCKER-USER -i eth0 ! -s 159.65.51.187 -j DROP
 - [💬 Issue](https://github.com/kylemanna/docker-openvpn/issues/288) and [📙 tutorial](https://heavymetaldev.com/openvpn-with-docker) for specify openvpn routes
 
 - Kylemanna openvpn docker image [📄 doc](https://github.com/kylemanna/docker-openvpn) and [▶️ video](https://www.youtube.com/watch?v=Ulew2JHUHfE) tutorial
+
+- Kylemanna openvpn [🐙 docker-compose doc](https://github.com/kylemanna/docker-openvpn) https://github.com/kylemanna/docker-openvpn/blob/master/docs/docker-compose.md
