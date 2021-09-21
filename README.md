@@ -138,6 +138,8 @@ ip route list default
 sudo iptables -I DOCKER-USER -i eth0 ! -s 111.111.111.111 -j DROP
 ```
 
+📝 Note: This restrict **outbound** connections during image 🏢 building, follow this [🦮 guide](https://medium.com/swlh/how-to-whitelist-ip-addresses-to-access-desired-docker-containers-5f6c8fcfa7f6) or set 🛡️ firewall rules in your cloud service for allowing them
+
 - ❤️ Useful commands
 
 ```shell
