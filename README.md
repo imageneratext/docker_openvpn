@@ -114,6 +114,15 @@ sudo apt-get -y install network-manager-openvpn
 
 5. Go to _IPv4_ section and ✅ check _"Use this connection only for resources on its network"_ (this let us ↪️ redirect to _VPN_ only traffic of routes added). <details><summary>See image</summary>![ipv4_vpn_setting](https://user-images.githubusercontent.com/22328176/126045421-a7c1a4f7-e6b5-4cde-8386-44f64ce010d2.png)</details>
 
+
+For automatically 🔛 turn on VPN
+
+1. 🐚 Run `nm-connection-editor`
+
+2. ➡ Click in _"Wired connection 1"_. <details><summary>See image</summary>![network_connection](https://user-images.githubusercontent.com/22328176/134207485-d72481a9-3649-4094-a608-421257dd818d.png)</details>
+
+3. Go to _"General"_ tab, ☑️ check _"Automatically connect to VPN"_ and choose the desired connection. <details><summary>See image</summary>![wired_connection](https://user-images.githubusercontent.com/22328176/134207430-938d2bba-07e3-44da-a452-dabe8657fea4.png)</details>
+
 ## 📱 Configure internal app
 
 - Check external interface (e.g: `eth0`)
@@ -142,6 +151,6 @@ sudo iptables -D DOCKER-USER -i eth0 ! -s 111.111.111.111 -j DROP
 
 - [💬 Issue](https://github.com/kylemanna/docker-openvpn/issues/288) and [📙 tutorial](https://heavymetaldev.com/openvpn-with-docker) for specify openvpn routes
 
-- Kylemanna openvpn docker image [📄 doc](https://github.com/kylemanna/docker-openvpn) and [▶️ video](https://www.youtube.com/watch?v=Ulew2JHUHfE) tutorial
+- Kylemanna openvpn docker image [📄 doc](https://github.com/kylemanna/docker-openvpn#openvpn-for-docker) and [▶️ video](https://www.youtube.com/watch?v=Ulew2JHUHfE) tutorial
 
 - Kylemanna openvpn [🐙 docker-compose doc](https://github.com/kylemanna/docker-openvpn/blob/master/docs/docker-compose.md)
