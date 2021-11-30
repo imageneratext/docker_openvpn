@@ -1,20 +1,22 @@
 # 🔒 Docker openvpn server
 
-Create a _VPN_ server for connect to 🔗 private networks
+- Create a [openvpn](https://openvpn.net/) server for connect to 🔗 private networks
 
-This project uses [kylemanna openvpn](https://hub.docker.com/r/kylemanna/openvpn) 🐋 docker image
+- This project uses [kylemanna openvpn](https://hub.docker.com/r/kylemanna/openvpn) 🐋 docker image
 
 ## ℹ️ Context
 
 ### 😬 Problem
 
 - We want 🚀 deploy an docker application in the ☁️ cloud **restricting** the access via _VPN_ (it is an internal company app)
-- In the clients we only want to ↪️ redirect the **traffic** to the _VPN_ when we go to the internal application, the rest going through the 📍 local network
+
+- In the clients we only want to ↪️ redirect the **traffic** to the _VPN_ when we go to the url of the internal application, the rest going through the 📍 local network
 
 ### 💼 Solution
 
-- Create _VPN_ server specifying the _IP_ 🛣️ route of the internal app
-- In the internal app server, we restrict all 🔗 connections _IPs_ except of the _VPN_ server (image from [heavymetaldev](https://heavymetaldev.com/openvpn-with-docker))
+- Create a _VPN_ server and specify the _IP_ 🛣️ route of the internal app
+
+- In the internal app server, we restrict all 🔌 connections _IPs_ except of the _VPN_ server (image from [heavymetaldev](https://heavymetaldev.com/openvpn-with-docker))
 
 ![vpn_diagram](https://user-images.githubusercontent.com/22328176/126044983-3883e6e1-276c-430d-8610-850a425fc562.png)
 
@@ -38,19 +40,20 @@ git clone https://github.com/imageneratext/docker_openvpn.git
 ### 👨‍🔧 Configure open-vpn
 
 ```shell
-export PUBLIC_SERVER_IP="111.111.111.111"
+export PUBLIC_SERVER_IP=$(curl ifconfig.me.)
 export ROUTE="route 222.222.222.222 255.255.255.255"
 docker-compose run --rm openvpn ovpn_genconfig -N -d -u udp://${PUBLIC_SERVER_IP} -p "route 172.17.0.0 255.255.0.0" -p ${ROUTE}
 ```
 
 📝 Notes:
 
-- `PUBLIC_SERVER_IP` is the public _IP_ of _VPN_ server (it could specify the domain)
-- `ROUTE` indicates the _domain/IP_ which the _VPN_ will route traffic from client (it can be a _IPs_ range like `ROUTE="route 222.222.222.0 255.255.255.0"` or several `-p` arguments)
+- `PUBLIC_SERVER_IP` is the 📍 public _IP_ of _VPN_ server (it could specify the domain)
+- `ROUTE` indicates the _domain/IP_ which the _VPN_ will 🛣️ route the traffic from client (it can be a _IPs_ range like `ROUTE="route 222.222.222.0 255.255.255.0"` or several `-p` arguments)
+- The route `172.17.0.0 255.255.0.0` is the default 🐋 docker subnet
 
-### 🔑 Create CA key
+### 🔑 Create CA key passphrase
 
-Run the next command and set a _CA_ password
+Run the next command and set a _CA_ passphrase (it ask ✅ serveral comfirmations)
 
 ```shell
 docker-compose run --rm openvpn ovpn_initpki
@@ -62,49 +65,49 @@ docker-compose run --rm openvpn ovpn_initpki
 docker-compose up -d openvpn
 ```
 
-### 👤 Create client certificates
+### 👤 Create and copy client certificates
 
-Will ask a password for the client and specify the _CA_ to authenticate
+- ➕ Generate one providing a **password** for the client and specifying the _CA_ **passphrase**
 
-```shell
-export CLIENTNAME="client_1"
-docker-compose run --rm openvpn easyrsa build-client-full $CLIENTNAME
-docker-compose run --rm openvpn ovpn_getclient $CLIENTNAME > $CLIENTNAME.ovpn
-```
+  ```shell
+  export CLIENT_NAME="client_1"
+  ssh user@public_server_ip "cd docker_openvpn && docker-compose run --rm openvpn easyrsa build-client-full $CLIENT_NAME"
+  ```
 
-📝 Note: We recommend create them with password (to avoid it add `nopass` argument)
+  📝 Note: To generate it without password add `nopass` argument
+
+- 📥 Get and copy `.ovpn` file to local host
+
+  ```shell
+  ssh user@public_server_ip "cd docker_openvpn && docker-compose run --rm openvpn ovpn_getclient $CLIENT_NAME" > $CLIENT_NAME.ovpn
+  ```
 
 ### 🧹 Revoke client certificates
 
 ```shell
-# Keep the corresponding crt, key and req files
-docker-compose run --rm openvpn ovpn_revokeclient $CLIENTNAME
-# Remove the corresponding crt, key and req files
-docker-compose run --rm openvpn ovpn_revokeclient $CLIENTNAME remove
+# Keep the corresponding certificate, key and files
+ssh user@public_server_ip "cd docker_openvpn && docker-compose run --rm openvpn ovpn_revokeclient $CLIENT_NAME"
+
+# Remove the corresponding certificate, key and req files
+ssh user@public_server_ip "cd docker_openvpn && docker-compose run --rm openvpn ovpn_revokeclient $CLIENT_NAME remove"
 ```
 
-## 💻 Configure client
-
-- 📥 Copy certificate file from client
-
-```shell
-scp user@public_server_ip:path/client_name.ovpn .
-```
+## 💻 Configure the client
 
 - 🔛 Enable client _VPN_ via shell
 
-```shell
-sudo apt-get install openvpn
-sudo openvpn --config client_name.ovpn
-```
+  ```shell
+  sudo apt-get install openvpn
+  sudo openvpn --config "$CLIENT_NAME.ovpn"
+  ```
 
-### 🖱️ Configure client vpn with _GUI_ (Ubuntu)
+### 🖱️ Configure client with _GUI_ (Ubuntu)
 
 1. Install _network-manager-openvpn_
 
-```shell
-sudo apt-get -y install network-manager-openvpn
-```
+   ```shell
+   sudo apt-get -y install network-manager-openvpn
+   ```
 
 2. Open 📶 network settings and add a new _VPN_ target
 
@@ -128,27 +131,28 @@ For automatically 🔛 turn on VPN
 
 - Check external interface (e.g: `eth0`)
 
-```shell
-ip route list default
-# eg output: default via 139.59.160.1 dev eth0 proto static
-```
+  ```shell
+  ip route list default
+  # eg output: default via 139.59.160.1 dev eth0 proto static
+  ```
 
-- 🔐 Restricts connections to all _IPs_ except of the _VPN_ server via `iptables` how say in [🐋 docker doc](https://docs.docker.com/network/iptables/#restrict-connections-to-the-docker-host)
+- 🔐 Restricts connections to all _IPs_ except of the _VPN_ server via `iptables` how say in docker [📘 doc](https://docs.docker.com/network/iptables/#restrict-connections-to-the-docker-host)
 
-```shell
-sudo iptables -I DOCKER-USER -i eth0 ! -s 111.111.111.111 -j DROP
-```
+  ```shell
+  sudo iptables -I DOCKER-USER -i eth0 ! -s 111.111.111.111 -j DROP
+  ```
 
-📝 Note: This restrict **outbound** connections during image 🏢 building, follow this [🦮 guide](https://medium.com/swlh/how-to-whitelist-ip-addresses-to-access-desired-docker-containers-5f6c8fcfa7f6) or set 🛡️ firewall rules in your cloud service for allowing them
+  📝 Note: This restrict **outbound** connections during image 🏢 building, follow this [🦮 guide](https://medium.com/swlh/how-to-whitelist-ip-addresses-to-access-desired-docker-containers-5f6c8fcfa7f6) or configure 🧑‍🚒 firewall rules in your cloud service for restrict it
 
 - ❤️ Useful commands
 
-```shell
-# to show iptables rules
-sudo iptables -L --line-numbers
-# to remove iptables rules
-sudo iptables -D DOCKER-USER -i eth0 ! -s 111.111.111.111 -j DROP
-```
+  ```shell
+  # to show iptables rules
+  sudo iptables -L --line-numbers
+
+  # to remove iptables rules
+  sudo iptables -D DOCKER-USER -i eth0 ! -s 111.111.111.111 -j DROP
+  ```
 
 ## 🖇️ References
 
