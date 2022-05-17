@@ -48,7 +48,7 @@ docker-compose run --rm openvpn ovpn_genconfig -N -d -u udp://${PUBLIC_SERVER_IP
 📝 Notes:
 
 - `PUBLIC_SERVER_IP` is the 📍 public _IP_ of _VPN_ server (it could specify the domain)
-- `ROUTE` indicates the _domain/IP_ which the _VPN_ will 🛣️ route the traffic from client (it can be a _IPs_ range like `ROUTE="route 222.222.222.0 255.255.255.0"` or several `-p` arguments)
+- `ROUTE` indicates the _domain/IP_ which the _VPN_ will 🛣️ route the traffic from client (it can be a _IPs_ range like `ROUTE="route 222.222.222.0 255.255.255.0"` or several `-p` arguments). Once run, we also can add routes ✏️ editing the config file `openvpn-data/conf/openvpn.conf`
 - The route `172.17.0.0 255.255.0.0` is the default 🐋 docker subnet
 
 ### 🔑 Create CA key passphrase
