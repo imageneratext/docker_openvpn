@@ -92,6 +92,20 @@ ssh user@public_server_ip "cd docker_openvpn && docker-compose run --rm openvpn 
 ssh user@public_server_ip "cd docker_openvpn && docker-compose run --rm openvpn ovpn_revokeclient $CLIENT_NAME remove"
 ```
 
+### 🆙 Renew CA certificate ([source](https://github.com/kylemanna/docker-openvpn/issues/704))
+
+```shell
+docker exec -it openvpn sh
+
+mv /etc/openvpn/pki/reqs/$PUBLIC_SERVER_IP.req /etc/openvpn/pki/reqs/$PUBLIC_SERVER_IP.req.backup.1
+mv /etc/openvpn/pki/private/$PUBLIC_SERVER_IP.key /etc/openvpn/pki/private/$PUBLIC_SERVER_IP.key.backup.1
+mv /etc/openvpn/pki/issued/$PUBLIC_SERVER_IP.crt /etc/openvpn/pki/issued/$PUBLIC_SERVER_IP.crt.backup.1
+
+
+cd /etc/openvpn
+easyrsa build-server-full $PUBLIC_SERVER_IP nopass
+```
+
 ## 💻 Configure the client
 
 - 🔛 Enable client _VPN_ via shell
