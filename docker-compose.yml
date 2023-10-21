@@ -1,12 +1,14 @@
-version: '3.5'
+version: "3.5"
 services:
   openvpn:
     cap_add:
-     - NET_ADMIN
+      - NET_ADMIN
+    environment:
+      - EASYRSA_CERT_EXPIRE=18262
     image: kylemanna/openvpn:2.4
     container_name: openvpn
     ports:
-     - "1194:1194/udp"
+      - "1194:1194/udp"
     restart: always
     volumes:
-     - ./openvpn-data/conf:/etc/openvpn
+      - ./openvpn-data/conf:/etc/openvpn
